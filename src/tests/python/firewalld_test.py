@@ -33,6 +33,7 @@ from firewall.config.dbus import DBUS_PATH, DBUS_PATH_CONFIG, DBUS_INTERFACE, \
 from firewall.dbus_utils import dbus_to_python
 from pprint import pprint
 
+
 class TestFirewallD(unittest.TestCase):
     """
     For testing of temporary changes, ie. those that disappear with restart:
@@ -54,12 +55,12 @@ class TestFirewallD(unittest.TestCase):
 
     def test_get_setDefaultZone(self):
         old_zone = dbus_to_python(self.fw.getDefaultZone())
-        print ("\nCurrent default zone is '%s'" % old_zone)
+        print("\nCurrent default zone is '%s'" % old_zone)
 
         self.fw_zone.addInterface("", "foo")
         self.fw_zone.addInterface(old_zone, "bar")
 
-        print ("Setting default zone to 'external'")
+        print("Setting default zone to 'external'")
         self.fw.setDefaultZone("external")
 
         # make sure the default zone was properly set
@@ -68,7 +69,7 @@ class TestFirewallD(unittest.TestCase):
         self.assertTrue(self.fw_zone.queryInterface("external", "foo"))
         self.assertTrue(self.fw_zone.queryInterface(old_zone, "bar"))
 
-        print ("Re-setting default zone back to '%s'" % old_zone)
+        print("Re-setting default zone back to '%s'" % old_zone)
         self.fw.setDefaultZone(old_zone)
         self.fw_zone.removeInterface("", "foo")
         self.fw_zone.removeInterface("", "bar")
@@ -77,13 +78,13 @@ class TestFirewallD(unittest.TestCase):
         interface = "baz"
         zone = "home"
 
-        print ("\nAdding interface '%s' to '%s' zone" % (interface, zone))
+        print("\nAdding interface '%s' to '%s' zone" % (interface, zone))
         self.fw_zone.addInterface(zone, interface)
 
-        print ("Getting active zones: ")
+        print("Getting active zones: ")
         ret = self.fw_zone.getActiveZones()
         self.assertTrue(len(ret)>0)
-        pprint (dbus_to_python(ret))
+        pprint(dbus_to_python(ret))
 
         self.fw_zone.removeInterface(zone, interface) #cleanup
 
@@ -96,89 +97,89 @@ class TestFirewallD(unittest.TestCase):
         interface = "foo"
         zone = "trusted"
 
-        print ("\nAdding interface '%s' to '%s' zone" % (interface, zone))
+        print("\nAdding interface '%s' to '%s' zone" % (interface, zone))
         ret = self.fw_zone.addInterface(zone, interface)
         self.assertEqual(ret, zone)
         self.assertTrue(self.fw_zone.queryInterface(zone, interface))
 
-        print ("Re-adding")
+        print("Re-adding")
         self.assertRaisesRegexp(Exception, 'ZONE_ALREADY_SET', self.fw_zone.addInterface, zone, interface)
 
         zone = "block"
-        print ("Re-adding interface '%s' to '%s' zone" % (interface, zone))
+        print("Re-adding interface '%s' to '%s' zone" % (interface, zone))
         self.assertRaisesRegexp(Exception, 'ZONE_CONFLICT', self.fw_zone.addInterface, zone, interface)
 
-        print ("Removing interface '%s' from '%s' zone" % (interface, zone))
+        print("Removing interface '%s' from '%s' zone" % (interface, zone))
         self.assertRaisesRegexp(Exception, 'ZONE_CONFLICT', self.fw_zone.removeInterface, zone, interface)
 
         zone = "trusted"
-        print ("Removing interface '%s' from '%s' zone" % (interface, zone))
+        print("Removing interface '%s' from '%s' zone" % (interface, zone))
         ret = self.fw_zone.removeInterface(zone, interface)
         self.assertEqual(ret, zone)
         self.assertFalse(self.fw_zone.queryInterface(zone, interface))
-        print ("Re-removing")
+        print("Re-removing")
         self.assertRaises(Exception, self.fw_zone.removeInterface, zone, interface)
 
-        print ("Add again and remove interface '%s' from zone it belongs to" % interface)
+        print("Add again and remove interface '%s' from zone it belongs to" % interface)
         self.fw_zone.addInterface(zone, interface)
         self.assertTrue(self.fw_zone.queryInterface(zone, interface))
         ret = self.fw_zone.removeInterface("", interface)
         self.assertEqual(ret, zone)
         self.assertFalse(self.fw_zone.queryInterface(zone, interface))
-        print ("Re-removing")
+        print("Re-removing")
         self.assertRaises(Exception, self.fw_zone.removeInterface, "", interface)
 
     def test_zone_change_queryZone(self):
         interface = "foo"
         zone = "internal"
 
-        print ("\nChanging zone of interface '%s' to '%s'" % (interface, zone))
+        print("\nChanging zone of interface '%s' to '%s'" % (interface, zone))
         ret = self.fw_zone.changeZone(zone, interface)
         self.assertEqual(ret, zone)
         self.assertTrue(self.fw_zone.queryInterface(zone, interface))
 
-        print ("Get zone of interface '%s': " % (interface))
+        print("Get zone of interface '%s': " % (interface))
         ret = self.fw_zone.getZoneOfInterface(interface)
         self.assertEqual(ret, zone)
-        print (dbus_to_python(ret))
+        print(dbus_to_python(ret))
 
         self.fw_zone.removeInterface(zone, interface) #cleanup
 
     def test_zone_add_get_query_removeService(self):
         service = "samba"
         zone = "external"
-        print ("\nAdding service '%s' to '%s' zone" % (service, zone))
+        print("\nAdding service '%s' to '%s' zone" % (service, zone))
         ret = self.fw_zone.addService(zone, service, 0)
         self.assertEqual(ret, zone)
-        print ("Re-adding")
+        print("Re-adding")
         self.assertRaisesRegexp(Exception, 'ALREADY_ENABLED', self.fw_zone.addService, zone, service, 0)
 
-        print ("Get services of zone '%s'" % (zone))
+        print("Get services of zone '%s'" % (zone))
         ret = self.fw_zone.getServices(zone)
         self.assertTrue(len(ret)>0)
-        pprint (dbus_to_python(ret))
+        pprint(dbus_to_python(ret))
 
-        print ("Removing service '%s' from '%s' zone" % (service, zone))
+        print("Removing service '%s' from '%s' zone" % (service, zone))
         ret = self.fw_zone.removeService(zone, service)
         self.assertEqual(ret, zone)
-        print ("Re-removing")
+        print("Re-removing")
         self.assertRaisesRegexp(Exception, 'NOT_ENABLED', self.fw_zone.removeService, zone, service)
 
         zone = "dmz"
         timeout = 2
-        print ("Adding timed service '%s' to '%s' zone, active for %d seconds" % (service, zone, timeout))
+        print("Adding timed service '%s' to '%s' zone, active for %d seconds" % (service, zone, timeout))
         ret = self.fw_zone.addService(zone, service, timeout)
         self.assertEqual(ret, zone)
         self.assertTrue(self.fw_zone.queryService(zone, service))
         time.sleep(timeout+1)
-        print ("Checking if timeout has been working")
+        print("Checking if timeout has been working")
         self.assertFalse(self.fw_zone.queryService(zone, service))
 
     def test_zone_add_get_query_removePort(self):
         port = "443"
         protocol="tcp"
         zone = "public"
-        print ("\nAdding port '%s/%s' to '%s' zone" % (port, protocol, zone))
+        print("\nAdding port '%s/%s' to '%s' zone" % (port, protocol, zone))
         ret = self.fw_zone.addPort(zone, port, protocol, 0)
         self.assertEqual(ret, zone)
         print ("Re-adding port")

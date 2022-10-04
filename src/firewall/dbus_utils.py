@@ -19,17 +19,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-__all__ = [ "command_of_pid", "pid_of_sender", "uid_of_sender", "user_of_uid",
-            "context_of_sender", "command_of_sender", "user_of_sender",
-            "dbus_to_python", "dbus_signature",
-            "dbus_introspection_prepare_properties",
-            "dbus_introspection_add_properties" ]
+__all__ = ["command_of_pid", "pid_of_sender", "uid_of_sender", "user_of_uid",
+           "context_of_sender", "command_of_sender", "user_of_sender",
+           "dbus_to_python", "dbus_signature",
+           "dbus_introspection_prepare_properties",
+           "dbus_introspection_add_properties"]
 
 import dbus
 import pwd
 from xml.dom import minidom
 
 from firewall.core.logger import log
+
 
 def command_of_pid(pid):
     """ Get command for pid from /proc """
@@ -39,6 +40,7 @@ def command_of_pid(pid):
     except Exception:
         return None
     return cmd
+
 
 def pid_of_sender(bus, sender):
     """ Get pid from sender string using
@@ -53,6 +55,7 @@ def pid_of_sender(bus, sender):
         return None
     return pid
 
+
 def uid_of_sender(bus, sender):
     """ Get user id from sender string using
     org.freedesktop.DBus.GetConnectionUnixUser """
@@ -66,6 +69,7 @@ def uid_of_sender(bus, sender):
         return None
     return uid
 
+
 def user_of_uid(uid):
     """ Get user for uid from pwd """
 
@@ -75,6 +79,7 @@ def user_of_uid(uid):
         return None
     return pws[0]
 
+
 def context_of_sender(bus, sender):
     """ Get SELinux context from sender string using
     org.freedesktop.DBus.GetConnectionSELinuxSecurityContext """
@@ -83,19 +88,22 @@ def context_of_sender(bus, sender):
     dbus_iface = dbus.Interface(dbus_obj, 'org.freedesktop.DBus')
 
     try:
-        context =  dbus_iface.GetConnectionSELinuxSecurityContext(sender)
+        context = dbus_iface.GetConnectionSELinuxSecurityContext(sender)
     except Exception:
         return None
 
     return "".join(map(chr, dbus_to_python(context)))
+
 
 def command_of_sender(bus, sender):
     """ Return command of D-Bus sender """
 
     return command_of_pid(pid_of_sender(bus, sender))
 
+
 def user_of_sender(bus, sender):
     return user_of_uid(uid_of_sender(bus, sender))
+
 
 def dbus_to_python(obj, expected_type=None):
     if obj is None:
@@ -123,10 +131,10 @@ def dbus_to_python(obj, expected_type=None):
     elif isinstance(obj, dbus.Dictionary):
         python_obj = {dbus_to_python(k): dbus_to_python(v) for k, v in obj.items()}
     elif isinstance(obj, bool) or \
-         isinstance(obj, str) or isinstance(obj, bytes) or \
-         isinstance(obj, int) or isinstance(obj, float) or \
-         isinstance(obj, list) or isinstance(obj, tuple) or \
-         isinstance(obj, dict):
+            isinstance(obj, str) or isinstance(obj, bytes) or \
+            isinstance(obj, int) or isinstance(obj, float) or \
+            isinstance(obj, list) or isinstance(obj, tuple) or \
+            isinstance(obj, dict):
         python_obj = obj
     else:
         raise TypeError("Unhandled %s" % repr(obj))
@@ -142,6 +150,7 @@ def dbus_to_python(obj, expected_type=None):
             raise TypeError("%s is %s, expected %s" % (python_obj, type(python_obj), expected_type))
 
     return python_obj
+
 
 def dbus_signature(obj):
     if isinstance(obj, dbus.Boolean):
@@ -178,25 +187,27 @@ def dbus_signature(obj):
     else:
         raise TypeError("Unhandled %s" % repr(obj))
 
+
 def dbus_introspection_prepare_properties(obj, interface, access=None):
     if access is None:
-        access = { }
+        access = {}
 
     if not hasattr(obj, "_fw_dbus_properties"):
-        setattr(obj, "_fw_dbus_properties", { })
+        setattr(obj, "_fw_dbus_properties", {})
     dip = getattr(obj, "_fw_dbus_properties")
-    dip[interface] = { }
+    dip[interface] = {}
 
     try:
         _dict = obj.GetAll(interface)
     except Exception:
-        _dict = { }
-    for key,value in _dict.items():
-        dip[interface][key] = { "type": dbus_signature(value) }
+        _dict = {}
+    for key, value in _dict.items():
+        dip[interface][key] = {"type": dbus_signature(value)}
         if key in access:
             dip[interface][key]["access"] = access[key]
         else:
             dip[interface][key]["access"] = "read"
+
 
 def dbus_introspection_add_properties(obj, data, interface):
     doc = minidom.parseString(data)
@@ -205,11 +216,11 @@ def dbus_introspection_add_properties(obj, data, interface):
         for node in doc.getElementsByTagName("interface"):
             if node.hasAttribute("name") and \
                node.getAttribute("name") == interface:
-                dip = { }
+                dip = {}
                 if getattr(obj, "_fw_dbus_properties"):
                     dip = getattr(obj, "_fw_dbus_properties")
                 if interface in dip:
-                    for key,value in dip[interface].items():
+                    for key, value in dip[interface].items():
                         prop = doc.createElement("property")
                         prop.setAttribute("name", key)
                         prop.setAttribute("type", value["type"])
@@ -220,6 +231,7 @@ def dbus_introspection_add_properties(obj, data, interface):
     new_data = doc.toxml()
     doc.unlink()
     return new_data
+
 
 def dbus_introspection_add_deprecated(obj, data, interface, deprecated_methods, deprecated_signals):
     doc = minidom.parseString(data)

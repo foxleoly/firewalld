@@ -49,6 +49,7 @@ NOPRINT_TRANS_TABLE = {
     i: None for i in range(0, 160) if not (i > 31 and i < 127)
 }
 
+
 def getPortID(port):
     """ Check and Get port id from port string or port id using socket.getservbyname
 

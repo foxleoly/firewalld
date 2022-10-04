@@ -57,6 +57,7 @@ from firewall.errors import FirewallError
 #
 ############################################################################
 
+
 class FirewallDConfig(DbusServiceObject):
     """FirewallD main class"""
 
@@ -96,35 +97,35 @@ class FirewallDConfig(DbusServiceObject):
         self.watcher.add_watch_file(config.FIREWALLD_CONF)
 
         dbus_introspection_prepare_properties(self, config.dbus.DBUS_INTERFACE_CONFIG,
-            {
-                "CleanupOnExit": "readwrite",
-                "CleanupModulesOnExit": "readwrite",
-                "IPv6_rpfilter": "readwrite",
-                "Lockdown": "readwrite",
-                "MinimalMark": "readwrite",
-                "IndividualCalls": "readwrite",
-                "LogDenied": "readwrite",
-                "AutomaticHelpers": "readwrite",
-                "FirewallBackend": "readwrite",
-                "FlushAllOnReload": "readwrite",
-                "RFC3964_IPv4": "readwrite",
-                "AllowZoneDrifting": "readwrite",
-            }
-        )
+                                              {
+                                                  "CleanupOnExit": "readwrite",
+                                                  "CleanupModulesOnExit": "readwrite",
+                                                  "IPv6_rpfilter": "readwrite",
+                                                  "Lockdown": "readwrite",
+                                                  "MinimalMark": "readwrite",
+                                                  "IndividualCalls": "readwrite",
+                                                  "LogDenied": "readwrite",
+                                                  "AutomaticHelpers": "readwrite",
+                                                  "FirewallBackend": "readwrite",
+                                                  "FlushAllOnReload": "readwrite",
+                                                  "RFC3964_IPv4": "readwrite",
+                                                  "AllowZoneDrifting": "readwrite",
+                                              }
+                                              )
 
     @handle_exceptions
     def _init_vars(self):
-        self.ipsets = [ ]
+        self.ipsets = []
         self.ipset_idx = 0
-        self.icmptypes = [ ]
+        self.icmptypes = []
         self.icmptype_idx = 0
-        self.services = [ ]
+        self.services = []
         self.service_idx = 0
-        self.zones = [ ]
+        self.zones = []
         self.zone_idx = 0
-        self.helpers = [ ]
+        self.helpers = []
         self.helper_idx = 0
-        self.policy_objects = [ ]
+        self.policy_objects = []
         self.policy_object_idx = 0
 
         for ipset in self.config.get_ipsets():
@@ -181,8 +182,7 @@ class FirewallDConfig(DbusServiceObject):
             try:
                 self.config.update_firewalld_conf()
             except Exception as msg:
-                log.error("Failed to load firewalld.conf file '%s': %s" % \
-                          (name, msg))
+                log.error("Failed to load firewalld.conf file '%s': %s" % (name, msg))
                 return
             props = self.GetAll(config.dbus.DBUS_INTERFACE_CONFIG).copy()
             for key in list(props.keys()):
@@ -193,9 +193,8 @@ class FirewallDConfig(DbusServiceObject):
                                        props, [])
             return
 
-        if (name.startswith(config.FIREWALLD_ICMPTYPES) or \
-            name.startswith(config.ETC_FIREWALLD_ICMPTYPES)) and \
-           name.endswith(".xml"):
+        if (name.startswith(config.FIREWALLD_ICMPTYPES) or name.startswith(config.ETC_FIREWALLD_ICMPTYPES)) \
+                and name.endswith(".xml"):
             try:
                 (what, obj) = self.config.update_icmptype_from_path(name)
             except Exception as msg:
@@ -208,9 +207,8 @@ class FirewallDConfig(DbusServiceObject):
             elif what == "update":
                 self._updateIcmpType(obj)
 
-        elif (name.startswith(config.FIREWALLD_SERVICES) or \
-              name.startswith(config.ETC_FIREWALLD_SERVICES)) and \
-             name.endswith(".xml"):
+        elif (name.startswith(config.FIREWALLD_SERVICES) or name.startswith(config.ETC_FIREWALLD_SERVICES)) and \
+                name.endswith(".xml"):
             try:
                 (what, obj) = self.config.update_service_from_path(name)
             except Exception as msg:
@@ -223,8 +221,7 @@ class FirewallDConfig(DbusServiceObject):
             elif what == "update":
                 self._updateService(obj)
 
-        elif name.startswith(config.FIREWALLD_ZONES) or \
-             name.startswith(config.ETC_FIREWALLD_ZONES):
+        elif name.startswith(config.FIREWALLD_ZONES) or name.startswith(config.ETC_FIREWALLD_ZONES):
             if name.endswith(".xml"):
                 try:
                     (what, obj) = self.config.update_zone_from_path(name)
@@ -250,9 +247,8 @@ class FirewallDConfig(DbusServiceObject):
                 elif self.watcher.has_watch(name):
                     self.watcher.remove_watch(name)
 
-        elif (name.startswith(config.FIREWALLD_IPSETS) or \
-              name.startswith(config.ETC_FIREWALLD_IPSETS)) and \
-             name.endswith(".xml"):
+        elif (name.startswith(config.FIREWALLD_IPSETS) or name.startswith(config.ETC_FIREWALLD_IPSETS)) and \
+                name.endswith(".xml"):
             try:
                 (what, obj) = self.config.update_ipset_from_path(name)
             except Exception as msg:
@@ -267,14 +263,12 @@ class FirewallDConfig(DbusServiceObject):
             elif what == "update":
                 self._updateIPSet(obj)
 
-        elif (name.startswith(config.FIREWALLD_HELPERS) or \
-              name.startswith(config.ETC_FIREWALLD_HELPERS)) and \
-             name.endswith(".xml"):
+        elif (name.startswith(config.FIREWALLD_HELPERS) or name.startswith(config.ETC_FIREWALLD_HELPERS)) and \
+                name.endswith(".xml"):
             try:
                 (what, obj) = self.config.update_helper_from_path(name)
             except Exception as msg:
-                log.error("Failed to load helper file '%s': %s" % (name,
-                                                                  msg))
+                log.error("Failed to load helper file '%s': %s" % (name, msg))
 
                 return
             if what == "new":
@@ -288,8 +282,7 @@ class FirewallDConfig(DbusServiceObject):
             try:
                 self.config.update_lockdown_whitelist()
             except Exception as msg:
-                log.error("Failed to load lockdown whitelist file '%s': %s" % \
-                          (name, msg))
+                log.error("Failed to load lockdown whitelist file '%s': %s" % (name, msg))
                 return
             self.LockdownWhitelistUpdated()
 
@@ -302,9 +295,8 @@ class FirewallDConfig(DbusServiceObject):
                 return
             self.Updated()
 
-        elif (name.startswith(config.FIREWALLD_POLICIES) or \
-              name.startswith(config.ETC_FIREWALLD_POLICIES)) and \
-             name.endswith(".xml"):
+        elif (name.startswith(config.FIREWALLD_POLICIES) or name.startswith(config.ETC_FIREWALLD_POLICIES)) and \
+                name.endswith(".xml"):
             try:
                 (what, obj) = self.config.update_policy_object_from_path(name)
             except Exception as msg:
@@ -340,7 +332,7 @@ class FirewallDConfig(DbusServiceObject):
 
     @handle_exceptions
     def removeIcmpType(self, obj):
-        index = 7 # see IMPORT_EXPORT_STRUCTURE in class Zone(IO_Object)
+        index = 7  # see IMPORT_EXPORT_STRUCTURE in class Zone(IO_Object)
         for zone in self.zones:
             settings = zone.getSettings()
             # if this IcmpType is used in a zone remove it from that zone first
@@ -386,7 +378,7 @@ class FirewallDConfig(DbusServiceObject):
 
     @handle_exceptions
     def removeService(self, obj):
-        index = 5 # see IMPORT_EXPORT_STRUCTURE in class Zone(IO_Object)
+        index = 5  # see IMPORT_EXPORT_STRUCTURE in class Zone(IO_Object)
         for zone in self.zones:
             settings = zone.getSettings()
             # if this Service is used in a zone remove it from that zone first
@@ -530,10 +522,10 @@ class FirewallDConfig(DbusServiceObject):
     def accessCheck(self, sender):
         if self.config._fw._state == "FAILED":
             raise FirewallError(errors.RUNNING_BUT_FAILED,
-                    "Changing permanent configuration is not allowed while "
-                    "firewalld is in FAILED state. The permanent "
-                    "configuration must be fixed and then firewalld "
-                    "restarted. Try `firewall-offline-cmd --check-config`.")
+                                "Changing permanent configuration is not allowed while "
+                                "firewalld is in FAILED state. The permanent "
+                                "configuration must be fixed and then firewalld "
+                                "restarted. Try `firewall-offline-cmd --check-config`.")
 
         if self.config.lockdown_enabled():
             if sender is None:
@@ -560,11 +552,11 @@ class FirewallDConfig(DbusServiceObject):
 
     @dbus_handle_exceptions
     def _get_property(self, prop):
-        if prop not in [ "DefaultZone", "MinimalMark", "CleanupOnExit",
-                         "CleanupModulesOnExit", "Lockdown", "IPv6_rpfilter",
-                         "IndividualCalls", "LogDenied", "AutomaticHelpers",
-                         "FirewallBackend", "FlushAllOnReload", "RFC3964_IPv4",
-                         "AllowZoneDrifting" ]:
+        if prop not in ["DefaultZone", "MinimalMark", "CleanupOnExit",
+                        "CleanupModulesOnExit", "Lockdown", "IPv6_rpfilter",
+                        "IndividualCalls", "LogDenied", "AutomaticHelpers",
+                        "FirewallBackend", "FlushAllOnReload", "RFC3964_IPv4",
+                        "AllowZoneDrifting"]:
             raise dbus.exceptions.DBusException(
                 "org.freedesktop.DBus.Error.InvalidArgs: "
                 "Property '%s' does not exist" % prop)
@@ -662,7 +654,7 @@ class FirewallDConfig(DbusServiceObject):
     @dbus_service_method(dbus.PROPERTIES_IFACE, in_signature='ss',
                          out_signature='v')
     @dbus_handle_exceptions
-    def Get(self, interface_name, property_name, sender=None): # pylint: disable=W0613
+    def Get(self, interface_name, property_name, sender=None):  # pylint: disable=W0613
         # get a property
         interface_name = dbus_to_python(interface_name, str)
         property_name = dbus_to_python(property_name, str)
@@ -670,8 +662,8 @@ class FirewallDConfig(DbusServiceObject):
 
         if interface_name == config.dbus.DBUS_INTERFACE_CONFIG:
             return self._get_dbus_property(property_name)
-        elif interface_name in [ config.dbus.DBUS_INTERFACE_CONFIG_DIRECT,
-                                 config.dbus.DBUS_INTERFACE_CONFIG_POLICIES ]:
+        elif interface_name in [config.dbus.DBUS_INTERFACE_CONFIG_DIRECT,
+                                config.dbus.DBUS_INTERFACE_CONFIG_POLICIES]:
             raise dbus.exceptions.DBusException(
                 "org.freedesktop.DBus.Error.InvalidArgs: "
                 "Property '%s' does not exist" % property_name)
@@ -683,20 +675,20 @@ class FirewallDConfig(DbusServiceObject):
     @dbus_service_method(dbus.PROPERTIES_IFACE, in_signature='s',
                          out_signature='a{sv}')
     @dbus_handle_exceptions
-    def GetAll(self, interface_name, sender=None): # pylint: disable=W0613
+    def GetAll(self, interface_name, sender=None):  # pylint: disable=W0613
         interface_name = dbus_to_python(interface_name, str)
         log.debug1("config.GetAll('%s')", interface_name)
 
-        ret = { }
+        ret = {}
         if interface_name == config.dbus.DBUS_INTERFACE_CONFIG:
-            for x in [ "DefaultZone", "MinimalMark", "CleanupOnExit",
-                       "CleanupModulesOnExit", "Lockdown", "IPv6_rpfilter",
-                       "IndividualCalls", "LogDenied", "AutomaticHelpers",
-                       "FirewallBackend", "FlushAllOnReload", "RFC3964_IPv4",
-                       "AllowZoneDrifting" ]:
+            for x in ["DefaultZone", "MinimalMark", "CleanupOnExit",
+                      "CleanupModulesOnExit", "Lockdown", "IPv6_rpfilter",
+                      "IndividualCalls", "LogDenied", "AutomaticHelpers",
+                      "FirewallBackend", "FlushAllOnReload", "RFC3964_IPv4",
+                      "AllowZoneDrifting"]:
                 ret[x] = self._get_property(x)
-        elif interface_name in [ config.dbus.DBUS_INTERFACE_CONFIG_DIRECT,
-                                 config.dbus.DBUS_INTERFACE_CONFIG_POLICIES ]:
+        elif interface_name in [config.dbus.DBUS_INTERFACE_CONFIG_DIRECT,
+                                config.dbus.DBUS_INTERFACE_CONFIG_POLICIES]:
             pass
         else:
             raise dbus.exceptions.DBusException(
@@ -717,31 +709,28 @@ class FirewallDConfig(DbusServiceObject):
         self.accessCheck(sender)
 
         if interface_name == config.dbus.DBUS_INTERFACE_CONFIG:
-            if property_name in [ "CleanupOnExit",
-                                  "CleanupModulesOnExit", "Lockdown",
-                                  "IPv6_rpfilter", "IndividualCalls",
-                                  "LogDenied",
-                                  "FirewallBackend", "FlushAllOnReload",
-                                  "RFC3964_IPv4"]:
-                if property_name in [ "CleanupOnExit", "CleanupModulesOnExit",
-                                      "Lockdown", "IPv6_rpfilter",
-                                      "IndividualCalls", "FlushAllOnReload",
-                                      "RFC3964_IPv4"]:
-                    if new_value.lower() not in [ "yes", "no",
-                                                  "true", "false" ]:
+            if property_name in ["CleanupOnExit",
+                                 "CleanupModulesOnExit", "Lockdown",
+                                 "IPv6_rpfilter", "IndividualCalls",
+                                 "LogDenied",
+                                 "FirewallBackend", "FlushAllOnReload",
+                                 "RFC3964_IPv4"]:
+                if property_name in ["CleanupOnExit", "CleanupModulesOnExit",
+                                     "Lockdown", "IPv6_rpfilter",
+                                     "IndividualCalls", "FlushAllOnReload",
+                                     "RFC3964_IPv4"]:
+                    if new_value.lower() not in ["yes", "no",
+                                                 "true", "false"]:
                         raise FirewallError(errors.INVALID_VALUE,
-                                            "'%s' for %s" % \
-                                            (new_value, property_name))
+                                            "'%s' for %s" % (new_value, property_name))
                 elif property_name == "LogDenied":
                     if new_value not in config.LOG_DENIED_VALUES:
                         raise FirewallError(errors.INVALID_VALUE,
-                                            "'%s' for %s" % \
-                                            (new_value, property_name))
+                                            "'%s' for %s" % (new_value, property_name))
                 elif property_name == "FirewallBackend":
                     if new_value not in config.FIREWALL_BACKEND_VALUES:
                         raise FirewallError(errors.INVALID_VALUE,
-                                            "'%s' for %s" % \
-                                            (new_value, property_name))
+                                            "'%s' for %s" % (new_value, property_name))
                 else:
                     raise dbus.exceptions.DBusException(
                         "org.freedesktop.DBus.Error.InvalidArgs: "
@@ -750,7 +739,7 @@ class FirewallDConfig(DbusServiceObject):
                 self.config.get_firewalld_conf().set(property_name, new_value)
                 self.config.get_firewalld_conf().write()
                 self.PropertiesChanged(interface_name,
-                                       { property_name: new_value }, [ ])
+                                       {property_name: new_value}, [])
             elif property_name in ["MinimalMark", "AutomaticHelpers", "AllowZoneDrifting"]:
                 # deprecated fields. Ignore setting them.
                 pass
@@ -758,8 +747,8 @@ class FirewallDConfig(DbusServiceObject):
                 raise dbus.exceptions.DBusException(
                     "org.freedesktop.DBus.Error.InvalidArgs: "
                     "Property '%s' does not exist" % property_name)
-        elif interface_name in [ config.dbus.DBUS_INTERFACE_CONFIG_DIRECT,
-                                 config.dbus.DBUS_INTERFACE_CONFIG_POLICIES ]:
+        elif interface_name in [config.dbus.DBUS_INTERFACE_CONFIG_DIRECT,
+                                config.dbus.DBUS_INTERFACE_CONFIG_POLICIES]:
             raise dbus.exceptions.DBusException(
                 "org.freedesktop.DBus.Error.InvalidArgs: "
                 "Property '%s' does not exist" % property_name)
@@ -1016,7 +1005,7 @@ class FirewallDConfig(DbusServiceObject):
         """get ipset names
         """
         log.debug1("config.getIPSetNames()")
-        ipsets = [ ]
+        ipsets = []
         for obj in self.ipsets:
             ipsets.append(obj.obj.name)
         return sorted(ipsets)
@@ -1107,7 +1096,7 @@ class FirewallDConfig(DbusServiceObject):
     @dbus.service.signal(config.dbus.DBUS_INTERFACE_CONFIG, signature='s')
     @dbus_handle_exceptions
     def IcmpTypeAdded(self, icmptype):
-        log.debug1("config.IcmpTypeAdded('%s')" % (icmptype))
+        log.debug1("config.IcmpTypeAdded('%s')" % icmptype)
 
     # S E R V I C E S
 
@@ -1190,7 +1179,7 @@ class FirewallDConfig(DbusServiceObject):
 
     @dbus_service_method(config.dbus.DBUS_INTERFACE_CONFIG, out_signature='as')
     @dbus_handle_exceptions
-    def getZoneNames(self, sender=None): # pylint: disable=W0613
+    def getZoneNames(self, sender=None):  # pylint: disable=W0613
         """get zone names
         """
         log.debug1("config.getZoneNames()")
@@ -1202,7 +1191,7 @@ class FirewallDConfig(DbusServiceObject):
     @dbus_service_method(config.dbus.DBUS_INTERFACE_CONFIG, in_signature='s',
                          out_signature='o')
     @dbus_handle_exceptions
-    def getZoneByName(self, zone, sender=None): # pylint: disable=W0613
+    def getZoneByName(self, zone, sender=None):  # pylint: disable=W0613
         """object path of zone with given name
         """
         zone = dbus_to_python(zone, str)
@@ -1672,7 +1661,7 @@ class FirewallDConfig(DbusServiceObject):
     def getPassthroughs(self, ipv, sender=None): # pylint: disable=W0613
         ipv = dbus_to_python(ipv)
         log.debug1("config.direct.getPassthroughs('%s')" % (ipv))
-        ret = [ ]
+        ret = []
         for idx in self.getSettings()[2]:
             if idx[0] == ipv:
                 ret.append(idx[1])
@@ -1682,6 +1671,6 @@ class FirewallDConfig(DbusServiceObject):
     @dbus_service_method(config.dbus.DBUS_INTERFACE_CONFIG_DIRECT,
                          out_signature='a(sas)')
     @dbus_handle_exceptions
-    def getAllPassthroughs(self, sender=None): # pylint: disable=W0613
+    def getAllPassthroughs(self, sender=None):# pylint: disable=W0613
         log.debug1("config.direct.getAllPassthroughs()")
         return self.getSettings()[2]

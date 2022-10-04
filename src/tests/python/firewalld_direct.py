@@ -30,6 +30,7 @@ import unittest
 from firewall import config
 from firewall.dbus_utils import dbus_to_python
 
+
 class TestFirewallDInterfaceDirect(unittest.TestCase):
     def setUp(self):
         unittest.TestCase.setUp(self)
@@ -69,7 +70,7 @@ class TestFirewallDInterfaceDirect(unittest.TestCase):
         self.assertRaisesRegexp(Exception, 'NOT_ENABLED',
                                 self.fw_direct.removeChain, "ipv4", "filter", "direct_foo2")
         ret = self.fw_direct.getChains("ipv4", "filter")
-        self.assertTrue(len(ret)==1) # "direct_foo1"
+        self.assertTrue(len(ret) == 1) # "direct_foo1"
         ret = self.fw_direct.queryChain("ipv4", "filter", "direct_foo2")
         self.assertFalse(dbus_to_python(ret))
 
@@ -109,6 +110,7 @@ class TestFirewallDInterfaceDirect(unittest.TestCase):
 
     def test_reload(self):
         self.fw.reload()
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestFirewallDInterfaceDirect)

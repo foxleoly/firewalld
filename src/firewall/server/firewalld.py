@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__all__ = [ "FirewallD" ]
+__all__ = ["FirewallD"]
 
 from gi.repository import GLib
 
@@ -60,6 +60,7 @@ from firewall.errors import FirewallError
 #
 ############################################################################
 
+
 class FirewallD(DbusServiceObject):
     """FirewallD main class"""
 
@@ -87,7 +88,7 @@ class FirewallD(DbusServiceObject):
         # tests if iptables and ip6tables are usable using test functions
         # loads default firewall rules for iptables and ip6tables
         log.debug1("start()")
-        self._timeouts = { }
+        self._timeouts = {}
         return self.fw.start()
 
     @handle_exceptions
@@ -125,7 +126,7 @@ class FirewallD(DbusServiceObject):
     @dbus_handle_exceptions
     def addTimeout(self, zone, x, tag):
         if zone not in self._timeouts:
-            self._timeouts[zone] = { }
+            self._timeouts[zone] = {}
         self._timeouts[zone][x] = tag
 
     @dbus_handle_exceptions

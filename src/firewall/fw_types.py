@@ -19,12 +19,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-__all__ = [ "LastUpdatedOrderedDict" ]
+__all__ = ["LastUpdatedOrderedDict"]
+
 
 class LastUpdatedOrderedDict(object):
     def __init__(self, x=None):
-        self._dict = { }
-        self._list = [ ]
+        self._dict = {}
+        self._list = []
         if x:
             self.update(x)
 
@@ -33,7 +34,7 @@ class LastUpdatedOrderedDict(object):
         self._dict.clear()
 
     def update(self, x):
-        for key,value in x.items():
+        for key, value in x.items():
             self[key] = value
 
     def items(self):
@@ -69,7 +70,7 @@ class LastUpdatedOrderedDict(object):
         return self._list[:]
 
     def values(self):
-        return [ self[key] for key in self._list ]
+        return [self[key] for key in self._list]
 
     def setdefault(self, key, value=None):
         if key in self:
