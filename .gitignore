@@ -51,4 +51,4 @@ Makefile.in
 !/po/firewalld.weblate.pot
 !/po/POTFILES.in
 /venv
-.idea
+/.idea
